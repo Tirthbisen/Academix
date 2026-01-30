@@ -3,7 +3,7 @@
 
 Academix is a modern, high-performance Flutter application designed for college students to manage their class attendance effortlessly. It features a sleek dark-themed UI, real-time analytics, and cloud-integrated reminders.
 
-## 🚀 Truthful Feature Set
+## 🚀 Feature Set
 
 ### 1. Dashboard & Smart Bunk Manager
 * **Dynamic Timetable:** View your classes based on the current day selected via an interactive calendar.
