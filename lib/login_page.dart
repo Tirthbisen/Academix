@@ -1,4 +1,6 @@
-// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, avoid_print, deprecated_member_use, unused_element
+
+
+// ignore_for_file: unused_element, depend_on_referenced_packages, use_build_context_synchronously, avoid_print, deprecated_member_use
 
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';

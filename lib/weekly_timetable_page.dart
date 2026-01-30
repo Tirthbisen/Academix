@@ -67,7 +67,7 @@ class _WeeklyTimetablePageState extends State<WeeklyTimetablePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Day Header
+          
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -98,7 +98,7 @@ class _WeeklyTimetablePageState extends State<WeeklyTimetablePage> {
               ],
             ),
           ),
-          // Classes for this day
+          
           if (classes.isEmpty)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),

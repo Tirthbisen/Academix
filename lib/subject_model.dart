@@ -13,7 +13,7 @@ class Subject {
     this.attendanceGoal = 75.0,
   });
 
-  // Convert a Map (from JSON) into a Subject object
+  
   factory Subject.fromJson(Map<String, dynamic> json) {
     return Subject(
       name: json['name'],
@@ -24,8 +24,8 @@ class Subject {
     );
   }
 
-  // Convert a Subject object into a Map (to save as JSON)
-  // Convert a Subject object into a Map (to save as JSON/Firestore)
+  
+  
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -33,7 +33,7 @@ class Subject {
       'total': total,
       'maxLectures': maxLectures,
       'attendanceGoal': attendanceGoal
-          .toDouble(), // Ensure it's always a double
+          .toDouble(), 
     };
   }
 }

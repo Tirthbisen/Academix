@@ -1,4 +1,6 @@
-// ignore_for_file: avoid_print, depend_on_referenced_packages, deprecated_member_use, unused_element, unused_local_variable
+
+
+// ignore_for_file: unused_element, unused_local_variable, depend_on_referenced_packages, avoid_print, deprecated_member_use
 
 import 'dart:convert';
 
@@ -129,7 +131,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               _navigateToComingSoon(context);
             },
           ),
-          const Spacer(), // Pushes the version to the bottom
+          const Spacer(), 
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
