@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage>
                   const SizedBox(height: 40),
                   _buildGlassTextField(
                     _emailController,
-                    "University Email",
+                    "Email",
                     Icons.email_outlined,
                   ),
                   const SizedBox(height: 15),
