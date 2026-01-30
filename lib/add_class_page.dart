@@ -1,41 +1,49 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-
-class Subject {
-  final String name;
-  final double attendanceGoal;
-  final int maxLectures;
-
-  Subject({
-    required this.name,
-    required this.attendanceGoal,
-    required this.maxLectures,
-  });
-}
+import 'subject_model.dart';
 
 class AddClassPage extends StatefulWidget {
-  const AddClassPage({super.key});
+  final List<Map<String, dynamic>>? existingTimetable;
+  final List<Subject> availableSubjects;
+
+  const AddClassPage({
+    super.key,
+    this.existingTimetable,
+    required this.availableSubjects,
+  });
 
   @override
   State<AddClassPage> createState() => _AddClassPageState();
 }
 
 class _AddClassPageState extends State<AddClassPage> {
-  late TextEditingController _nameController;
-  bool _doesNotRepeat = true;
-  String _selectedSubject = "Select subject...";
-  String _startTime = "11:00 AM";
-  String _endTime = "01:00 PM";
-  double _requiredAttendance = 75.0;
+  late TextEditingController _facultyController;
+
+  final List<String> _days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  String _selectedDay = "Monday";
+  String _startTime = "09:00 AM";
+  String _endTime = "10:00 AM";
+  String? _selectedSubjectName;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
+
+    _facultyController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _facultyController.dispose();
     super.dispose();
   }
 
@@ -45,75 +53,233 @@ class _AddClassPageState extends State<AddClassPage> {
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text("Add Weekly Class"),
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            _addClassToParent();
+            Navigator.pop(context);
+          },
         ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16, top: 10, bottom: 10),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_nameController.text.trim().isNotEmpty) {
-                  Navigator.pop(
-                    context,
-                    Subject(
-                      name: _nameController.text.trim(),
-                      attendanceGoal: _requiredAttendance, // <--- PASS THE SLIDER VALUE
-                      maxLectures: 45, // We will link this to L-T-P later
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              ),
-              child: const Text("Save", style: TextStyle(color: Colors.white)),
+            child: Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    _addClassToParent();
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                  ),
+                  child: const Text(
+                    "Done",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                ElevatedButton(
+                  onPressed: () {
+                    _addClassToParent();
+                    _clearForm();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                  ),
+                  child: const Text(
+                    "Add More",
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInputRow(Icons.school_outlined, _selectedSubject, onTap: () {
-              // Logic to pick from your subjects list could go here
-            }),
-            _buildInputRow(Icons.category_outlined, "Class component", subText: "Select component..."),
-            _buildInputRow(Icons.person_outline, "Add faculty name"),
-            const Divider(color: Colors.white10, thickness: 1, indent: 70),
-            _buildInputRow(Icons.calendar_today_outlined, "Sun, 25 Jan, 2026"),
-            _buildInputRow(Icons.access_time, "Starts at", trailing: _startTime),
-            _buildInputRow(Icons.access_time_filled, "Ends at", trailing: _endTime),
-            
-            // Repeat Toggle Row
-            ListTile(
-              leading: const Icon(Icons.repeat, color: Colors.white70),
-              title: const Text("Does not repeat", style: TextStyle(color: Colors.white70)),
-              trailing: Switch(
-                value: _doesNotRepeat,
-                activeColor: Colors.blue,
-                onChanged: (val) => setState(() => _doesNotRepeat = val),
+            const Text(
+              "Select Subject",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            
-            _buildInputRow(Icons.link, "Add meeting link"),
-            _buildInputRow(Icons.notes, "Add notes"),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButton<String>(
+                value: _selectedSubjectName,
+                dropdownColor: const Color(0xFF252A34),
+                isExpanded: true,
+                underline: const SizedBox(),
+                style: const TextStyle(color: Colors.white),
+                items: widget.availableSubjects
+                    .map(
+                      (s) =>
+                          DropdownMenuItem(value: s.name, child: Text(s.name)),
+                    )
+                    .toList(),
+                onChanged: (val) => setState(() => _selectedSubjectName = val),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Day of Week",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: DropdownButton<String>(
+                value: _selectedDay,
+                dropdownColor: const Color(0xFF252A34),
+                isExpanded: true,
+                underline: const SizedBox(),
+                style: const TextStyle(color: Colors.white),
+                items: _days
+                    .map(
+                      (day) => DropdownMenuItem(value: day, child: Text(day)),
+                    )
+                    .toList(),
+                onChanged: (val) => setState(() => _selectedDay = val!),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildTimeSection(
+              "Start Time",
+              _startTime,
+              (t) => setState(() => _startTime = t),
+            ),
+            const SizedBox(height: 20),
+            _buildTimeSection(
+              "End Time",
+              _endTime,
+              (t) => setState(() => _endTime = t),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Faculty Name (Optional)",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _facultyController,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFF1E1E1E),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInputRow(IconData icon, String title, {String? subText, String? trailing, VoidCallback? onTap}) {
-    return ListTile(
-      onTap: onTap,
-      leading: Icon(icon, color: Colors.white70),
-      title: Text(title, style: const TextStyle(color: Colors.white70)),
-      subtitle: subText != null ? Text(subText, style: const TextStyle(color: Colors.white38)) : null,
-      trailing: trailing != null ? Text(trailing, style: const TextStyle(color: Colors.white)) : null,
+  Widget _buildTimeSection(
+    String title,
+    String time,
+    Function(String) onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.now(),
+            );
+            if (picked != null) onChanged(picked.format(context));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.access_time, color: Colors.white54),
+                const SizedBox(width: 12),
+                Text(
+                  time,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  void _clearForm() {
+    setState(() {
+      _facultyController.clear();
+    });
+  }
+
+  void _addClassToParent() {
+    if (widget.existingTimetable != null && _selectedSubjectName != null) {
+      bool isDuplicate = widget.existingTimetable!.any(
+        (item) =>
+            item['subject'] == _selectedSubjectName &&
+            item['day'] == _selectedDay &&
+            item['startTime'] == _startTime,
+      );
+
+      if (isDuplicate) {
+        return;
+      }
+
+      setState(() {
+        widget.existingTimetable!.add({
+          'subject': _selectedSubjectName,
+          'day': _selectedDay,
+          'startTime': _startTime,
+          'endTime': _endTime,
+          'faculty': _facultyController.text.trim(),
+          'attendance': 'notmarked',
+        });
+      });
+    }
   }
 }

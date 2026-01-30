@@ -1,9 +1,13 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'subject_model.dart';
-import 'dart:async'; // Required for the Timer
+import 'dart:async';
 
 class AddSubjectPage extends StatefulWidget {
-  const AddSubjectPage({super.key});
+  final Subject? existingSubject;
+
+  const AddSubjectPage({super.key, this.existingSubject});
 
   @override
   State<AddSubjectPage> createState() => _AddSubjectPageState();
@@ -11,37 +15,40 @@ class AddSubjectPage extends StatefulWidget {
 
 class _AddSubjectPageState extends State<AddSubjectPage> {
   final TextEditingController _nameController = TextEditingController();
-  
-  // State for the features
+
   double _requiredAttendance = 75.0;
+  final int _maxLectures = 45;
   int _lectureWeight = 1;
   int _tutorialWeight = 1;
   int _practicalWeight = 1;
 
-  // --- TIMER LOGIC START ---
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.existingSubject != null) {
+      _nameController.text = widget.existingSubject!.name;
+      _requiredAttendance = widget.existingSubject!.attendanceGoal;
+    }
+  }
+
   Timer? _timer;
 
-  void _handleLongPress(Function(int) onChanged, int currentValue, int change) {
-    // Triggers every 100ms while holding
+  void _handleLongPress(VoidCallback onUpdate) {
+    onUpdate();
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      if (change == -1 && currentValue <= 0) {
-        _timer?.cancel();
-      } else {
-        currentValue += change;
-        onChanged(currentValue);
-      }
+      onUpdate();
     });
   }
 
   void _stopTimer() {
     _timer?.cancel();
   }
-  // --- TIMER LOGIC END ---
 
   @override
   void dispose() {
     _nameController.dispose();
-    _timer?.cancel(); // Important: Kill timer if user leaves page
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -66,14 +73,20 @@ class _AddSubjectPageState extends State<AddSubjectPage> {
                     context,
                     Subject(
                       name: _nameController.text.trim(),
-                      maxLectures: 45, 
+                      maxLectures: _maxLectures,
+                      attendanceGoal: _requiredAttendance,
+
+                      attended: widget.existingSubject?.attended ?? 0,
+                      total: widget.existingSubject?.total ?? 0,
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue.shade700,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
               child: const Text("Save", style: TextStyle(color: Colors.white)),
             ),
@@ -96,7 +109,6 @@ class _AddSubjectPageState extends State<AddSubjectPage> {
             ),
             const SizedBox(height: 40),
 
-            // Attendance Slider
             Row(
               children: [
                 Container(
@@ -111,7 +123,10 @@ class _AddSubjectPageState extends State<AddSubjectPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text("Required attendance", style: TextStyle(color: Colors.white70, fontSize: 16)),
+                const Text(
+                  "Required attendance",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                ),
               ],
             ),
             Slider(
@@ -128,24 +143,50 @@ class _AddSubjectPageState extends State<AddSubjectPage> {
               children: [
                 Icon(Icons.balance, color: Colors.white),
                 SizedBox(width: 10),
-                Text("Component weightage ratio", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(
+                  "Component weightage ratio",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 Spacer(),
                 Icon(Icons.help_outline, color: Colors.white54, size: 20),
               ],
             ),
             const SizedBox(height: 20),
 
-            // L-T-P Selectors
-            _buildWeightSelector("L", "LECTURE", _lectureWeight, (val) => setState(() => _lectureWeight = val)),
-            _buildWeightSelector("T", "TUTORIAL", _tutorialWeight, (val) => setState(() => _tutorialWeight = val)),
-            _buildWeightSelector("P", "PRACTICAL", _practicalWeight, (val) => setState(() => _practicalWeight = val)),
+            _buildWeightSelector(
+              "L",
+              "LECTURE",
+              _lectureWeight,
+              (val) => setState(() => _lectureWeight = val),
+            ),
+            _buildWeightSelector(
+              "T",
+              "TUTORIAL",
+              _tutorialWeight,
+              (val) => setState(() => _tutorialWeight = val),
+            ),
+            _buildWeightSelector(
+              "P",
+              "PRACTICAL",
+              _practicalWeight,
+              (val) => setState(() => _practicalWeight = val),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildWeightSelector(String initial, String label, int value, Function(int) onChanged) {
+  Widget _buildWeightSelector(
+    String initial,
+    String label,
+    int value,
+    Function(int) onChanged,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
@@ -160,18 +201,22 @@ class _AddSubjectPageState extends State<AddSubjectPage> {
             child: Text(initial, style: const TextStyle(color: Colors.white)),
           ),
           const SizedBox(width: 16),
-          Text(label, style: const TextStyle(color: Colors.white70, letterSpacing: 1.2)),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white70, letterSpacing: 1.2),
+          ),
           const Spacer(),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFE2F3D0), 
+              color: const Color(0xFFE2F3D0),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Row(
               children: [
-                // MINUS BUTTON (TAP + HOLD)
                 GestureDetector(
-                  onLongPressStart: (_) => _handleLongPress(onChanged, value, -1),
+                  onLongPressStart: (_) => _handleLongPress(() {
+                    if (value > 0) onChanged(value - 1);
+                  }),
                   onLongPressEnd: (_) => _stopTimer(),
                   onTap: () => value > 0 ? onChanged(value - 1) : null,
                   child: const Padding(
@@ -179,10 +224,17 @@ class _AddSubjectPageState extends State<AddSubjectPage> {
                     child: Icon(Icons.remove_circle, color: Color(0xFF8BC34A)),
                   ),
                 ),
-                Text("$value", style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-                // PLUS BUTTON (TAP + HOLD)
+                Text(
+                  "$value",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 GestureDetector(
-                  onLongPressStart: (_) => _handleLongPress(onChanged, value, 1),
+                  onLongPressStart: (_) => _handleLongPress(() {
+                    onChanged(value + 1);
+                  }),
                   onLongPressEnd: (_) => _stopTimer(),
                   onTap: () => onChanged(value + 1),
                   child: const Padding(

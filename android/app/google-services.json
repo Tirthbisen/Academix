@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "997844115510",
+    "project_id": "academix-67",
+    "storage_bucket": "academix-67.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997844115510:android:fba9ad4aa9eaa871323897",
+        "android_client_info": {
+          "package_name": "com.example.simple_tool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "997844115510-ll5k5fmakjllnuvuclqpl0j1nfd819iu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.simple_tool",
+            "certificate_hash": "e2a130b83c295fb7c1f25a65f0c76854abe7a433"
+          }
+        },
+        {
+          "client_id": "997844115510-rjphaf0hena8bmpd94gb6cae9l2msuir.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrICFlAC-NeLtmcmGJDVRAqwzUbRao4tg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "997844115510-rjphaf0hena8bmpd94gb6cae9l2msuir.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
