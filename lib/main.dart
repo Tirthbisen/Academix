@@ -1,5 +1,3 @@
-
-
 // ignore_for_file: unused_element, unused_local_variable, depend_on_referenced_packages, avoid_print, deprecated_member_use
 
 import 'dart:convert';
@@ -131,7 +129,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               _navigateToComingSoon(context);
             },
           ),
-          const Spacer(), 
+          const Spacer(),
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -1158,6 +1156,36 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       tileColor: Colors.white.withOpacity(0.05),
                     ),
                   ],
+                  const SizedBox(height: 10),
+
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline,
+                          color: Colors.amber,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "Note: Real-time notifications are currently optimized for local sessions. Cloud-based 24/7 background triggers are slated for v1.1.0 (Production Server deployment).",
+                            style: TextStyle(
+                              color: Colors.amber.shade200,
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             );
@@ -1172,7 +1200,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text("Logout", style: TextStyle(color: Colors.white)),
+        title: const Text(
+          "Logout",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         content: const Text(
           "Are you sure you want to exit?",
           style: TextStyle(color: Colors.white70),
@@ -1180,15 +1211,42 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.blueAccent),
+            ),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             onPressed: () async {
-              Navigator.pop(context);
-              await FirebaseAuth.instance.signOut();
+              try {
+                Navigator.pop(context);
+                await FirebaseAuth.instance.signOut();
+                await GoogleSignIn().signOut();
+              } catch (e) {
+                debugPrint("Guest Logout handled: $e");
+              } finally {
+                if (context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+                  );
+                }
+              }
             },
-            child: const Text("Logout", style: TextStyle(color: Colors.white)),
+            child: const Text(
+              "Logout",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

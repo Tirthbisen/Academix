@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,50 +39,71 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Future<void> _handleLogin() async {
-    setState(() => _isLoading = true);
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString().split(']').last}")),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please fill in all fields")),
+    );
+    return;
   }
+
+  setState(() => _isLoading = true);
+
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AttendanceScreen()),
+      );
+    }
+  } on FirebaseAuthException catch (e) {
+    String message = "something went wrong.";
+    if (e.code == 'user-not-found') {message = "No user found for that email.";}
+    else if (e.code == 'wrong-password') {message = "Wrong password provided.";}
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
+  }
+}
 
   Future<void> _signInWithGoogle() async {
-    setState(() => _isLoading = true);
-    try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-
-      await googleSignIn.signOut();
-
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      print("Error: $e");
-    } finally {
+  setState(() => _isLoading = true);
+  try {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) {
       setState(() => _isLoading = false);
+      return;
     }
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AttendanceScreen()),
+      );
+    }
+  } catch (e) {
+    debugPrint("Google Sign-In Error: $e");
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login Failed: $e")),
+      );
+    }
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +175,23 @@ class _LoginPageState extends State<LoginPage>
                         borderRadius: BorderRadius.circular(15),
                       ),
                       backgroundColor: Colors.white.withOpacity(0.05),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AttendanceScreen()), 
+                    );
+                  },
+                  child: Text(
+                    "Continue without login",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      decoration: TextDecoration.underline,
+                      fontSize: 14,
+                      ),
                     ),
                   ),
                 ],
