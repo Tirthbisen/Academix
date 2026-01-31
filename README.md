@@ -3,39 +3,38 @@
 
 Academix is a modern, high-performance Flutter application designed for college students to manage their class attendance effortlessly. It features a sleek dark-themed UI, real-time analytics, and cloud-integrated reminders.
 
-## 🚀 Feature Set
+
+
+## 🚀 Key Features
 
 ### 1. Dashboard & Smart Bunk Manager
-* **Dynamic Timetable:** View your classes based on the current day selected via an interactive calendar.
-* **Live Attendance Stats:** Instantly see your attendance percentage for each subject.
-* **The "Bunk" Logic:** Automatically calculates exactly how many lectures you can safely miss (Safe Zone) or how many you must attend (Danger Zone) to reach your target percentage (e.g., 75%).
+* **The "Bunk" Logic:** Automatically calculates exactly how many lectures you can safely miss (**Safe Zone**) or how many you must attend (**Danger Zone**) to maintain your target percentage.
+* **Live Analytics:** Dynamic progress rings provide a visual overview of your standing in every subject at a glance.
+* **Interactive History:** Mark attendance as **Present**, **Absent**, or **Cancelled** for any specific date with instant cloud sync.
 
-### 2. Subject & Schedule Management
-* **Subject Portfolio:** Add, Edit, or Delete subjects with custom attendance goals.
-* **Weekly Timetable:** Configure recurring classes with faculty names and time slots.
-* **Interactive History:** Mark attendance as **Present**, **Absent**, or **Cancelled** for any specific date.
+### 2. Smart Faculty Leave Requests (v1.0.1)
+* **Automated Email Generation:** One-tap professional email drafting that pulls subject data and "Safe Zone" analytics to suggest optimal leave dates to faculty while keeping you above 75%.
 
-### 3. Smart Notifications & Cloud Sync
-* **Firebase Integration:** Powered by Firebase Authentication for secure Google Sign-In.
-* **Daily Reminder Poke:** A specialized system that notifies you at a user-defined time to mark your daily attendance.
-* **Cloud Persistence:** Uses Firestore and Shared Preferences to ensure your attendance data is never lost.
-
-### 4. Modern UI/UX
-* **Glassmorphism Design:** A premium dark-themed interface optimized for high-resolution displays.
-* **70% Navigation Hub:** A sleek right-side drawer for quick access to Assignments and Account settings.
-* **Animated Transitions:** Smooth UI feedback using `AnimatedCrossFade` and custom physics-based logins.
+### 3. Flexible Authentication (Judge-Ready)
+* **Google Sign-In:** Secure authentication powered by **Firebase Auth**.
+* **Guest Bypass:** A dedicated "Continue without login" mode specifically implemented for the **GDG TechSprint** to allow judges to explore the core features instantly without credential barriers.
 
 ## 🛠️ Tech Stack
-* **Frontend:** Flutter (Dart)
+* **Frontend:** Flutter (Dart) - *Material 3 & Glassmorphism*
 * **Backend:** Firebase Auth, Cloud Firestore
-* **State Management:** StatefulWidgets & Shared Preferences
 * **Notifications:** Firebase Cloud Messaging (FCM)
+* **Hardware:** Developed and optimized on **Lenovo LOQ (Ryzen 7 7435HS, RTX 4060, 24GB RAM)**.
 
-## 🚧 Status: v1.0.1-stable
-* **Attendance Tracker:** Fully Functional ✅
-* **Subject Management:** Fully Functional ✅
-* **Assignments Section:** Coming Soon (for v1.1.0) ⏳
+## ⚠️ Technical Constraint: Notification Delivery
+> **Important:** The "Daily Poke" notification system currently operates via local triggers. Due to the absence of a dedicated 24/7 production server (VPS) for background cron-jobs, real-time cloud-pushed notifications may not trigger for all external users. This is a known infrastructure constraint resulting from current development funding limits and is slated for resolution in the v1.2.0 production deployment.
+
+
+
+## 🚧 Project Status: v1.0.1-beta
+* **Attendance & Bunk Logic:** Production-ready ✅
+* **Guest Access:** Fully Functional ✅
+* **Assignment Hub:** UI Mockup (Logic coming in v1.1.0) ⏳
 
 ## 💻 Developer
-**Tirth Bisen** Amity University 
-B.Tech CSE (Sem 2)
+**Tirth Bisen** Amity University
+*B.Tech Computer Science and Engineering (Sem 1)*
