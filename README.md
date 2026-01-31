@@ -36,5 +36,6 @@ Academix is a modern, high-performance Flutter application designed for college 
 * **Assignment Hub:** UI Mockup (Logic coming in v1.1.0) ⏳
 
 ## 💻 Developer
-**Tirth Bisen** Amity University
+**Tirth Bisen**  
+Amity University  
 *B.Tech Computer Science and Engineering (Sem 1)*
