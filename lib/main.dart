@@ -10,16 +10,26 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'add_class_page.dart';
 import 'add_subject_page.dart';
 import 'login_page.dart';
 import 'notification_service.dart';
 import 'subject_model.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Handling background message: ${message.messageId}");
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // 3. OPTIONAL: Request permissions for Android 13+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  await messaging.requestPermission(alert: true, badge: true, sound: true);
   await NotificationService.init();
   runApp(const AttendanceApp());
 }
@@ -71,6 +81,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void initState() {
     super.initState();
     _loadData();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      if (message.notification != null) {
+        NotificationService.showLocalPopup(
+          message.notification!.title ??
+              "Academix Poke", // First argument: Title
+          message.notification!.body ??
+              "Check your attendance!", // Second argument: Body
+        );
+      }
+    });
   }
 
   Widget _buildSidePanel(BuildContext context) {
@@ -447,11 +468,14 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Widget _buildCalendarHeader() {
-    final now = DateTime.now();
-    final firstDay = DateTime(now.year, now.month, 1);
-    final lastDay = DateTime(now.year, now.month + 1, 0);
+    // 🚀 Update: We now base the grid on _selectedDate instead of 'now'
+    // to allow month-to-month navigation.
+    final firstDay = DateTime(_selectedDate.year, _selectedDate.month, 1);
+    final lastDay = DateTime(_selectedDate.year, _selectedDate.month + 1, 0);
     final daysInMonth = lastDay.day;
-    final firstWeekday = firstDay.weekday;
+
+    // Calculate weekday offset (adjusting for Monday start)
+    final firstWeekday = firstDay.weekday - 1;
 
     final monthNames = [
       "January",
@@ -473,13 +497,53 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            monthNames[now.month - 1],
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          // ⬅️ Navigation Row ➡️
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "${monthNames[_selectedDate.month - 1]} ${_selectedDate.year}",
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.chevron_left,
+                      color: Colors.blueAccent,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedDate = DateTime(
+                          _selectedDate.year,
+                          _selectedDate.month - 1,
+                          1,
+                        );
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.blueAccent,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedDate = DateTime(
+                          _selectedDate.year,
+                          _selectedDate.month + 1,
+                          1,
+                        );
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Row(
@@ -510,18 +574,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ),
             itemCount: 42,
             itemBuilder: (context, index) {
-              final dayNumber = index - firstWeekday + 2;
+              final dayNumber = index - firstWeekday + 1;
 
               if (index < firstWeekday || dayNumber > daysInMonth) {
                 return const SizedBox();
               }
 
-              final cellDate = DateTime(now.year, now.month, dayNumber);
-              final isSelected =
-                  dayNumber == _selectedDate.day &&
-                  now.month == _selectedDate.month;
+              final cellDate = DateTime(
+                _selectedDate.year,
+                _selectedDate.month,
+                dayNumber,
+              );
+
+              // Comparison logic for styling
+              final isSelected = dayNumber == _selectedDate.day;
               final isToday =
-                  dayNumber == now.day && now.month == DateTime.now().month;
+                  dayNumber == DateTime.now().day &&
+                  _selectedDate.month == DateTime.now().month &&
+                  _selectedDate.year == DateTime.now().year;
 
               return GestureDetector(
                 onTap: () {
