@@ -22,8 +22,7 @@ Academix is a modern, high-performance Flutter application designed for college 
 ## 🛠️ Tech Stack
 * **Frontend:** Flutter (Dart) - *Material 3 & Glassmorphism*
 * **Backend:** Firebase Auth, Cloud Firestore
-* **Notifications:** Firebase Cloud Messaging (FCM)
-* **Hardware:** Developed and optimized on **Lenovo LOQ (Ryzen 7 7435HS, RTX 4060, 24GB RAM)**.
+* **Notifications:** Firebase Cloud Messaging (FCM).
 
 ## ⚠️ Technical Constraint: Notification Delivery
 > **Important:** The "Daily Poke" notification system currently operates via local triggers. Due to the absence of a dedicated 24/7 production server (VPS) for background cron-jobs, real-time cloud-pushed notifications may not trigger for all external users. This is a known infrastructure constraint resulting from current development funding limits and is slated for resolution in the v1.2.0 production deployment.
