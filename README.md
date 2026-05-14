@@ -20,7 +20,16 @@ Every college student in India needs to maintain 75% attendance or face conseque
 |---|---|---|
 | Google Auth + Email | Calendar + daily classes | Per-subject % with danger zone |
 
-> *Screenshots available in the releases section and app demo video*
+<img src="https://github.com/user-attachments/assets/7978bba2-bf2d-4d67-b7cb-37193d116c81" width="150"/>
+&nbsp;
+<img src="https://github.com/user-attachments/assets/27f9704c-a1e5-40ed-a792-a935868ae98d" width="150"/>
+&nbsp;
+<img src="https://github.com/user-attachments/assets/dea558ac-9189-4c93-be7e-8346993c9359" width="150"/>
+&nbsp;
+<img src="https://github.com/user-attachments/assets/ac0d7ebc-0037-45d2-824e-d879356aebaf" width="150"/>
+&nbsp;
+<img src="https://github.com/user-attachments/assets/2ebf59c6-0e09-4a51-9b21-0d605f684086" width="150"/>
+
 
 ---
 
